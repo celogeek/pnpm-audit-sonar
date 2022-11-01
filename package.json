@@ -1,0 +1,19 @@
+{
+  "name": "pnpm-audit-sonar",
+  "version": "1.0.0",
+  "description": "Convert PNPM audit to Sonar compatible format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.celogeek.com/celogeek/pnpm-audit-sonar.git"
+  },
+  "bin": {
+    "pnpm-audit-sonar": "index.js"
+  },
+  "author": "Celogeek",
+  "license": "ISC",
+  "dependencies": {}
+}
