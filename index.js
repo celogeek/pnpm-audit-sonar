@@ -25,40 +25,53 @@ async function readAudit() {
 
 
 const severities = {
-  info: 'INFO',
-  low: 'MINOR',
-  moderate: 'MINOR',
-  high: 'CRITICAL',
-  critical: 'BLOCKER',
+  info: 'LOW',
+  low: 'LOW',
+  moderate: 'MEDIUM',
+  high: 'MEDIUM',
+  critical: 'HIGH',
 };
 
 
 async function main() {
   const pnpmAudit = await readAudit()
+  const rules = []
   const issues = []
   for (const advice of Object.values(pnpmAudit.advisories || [])) {
-    issues.push({
-      "engineId": "pnpm-audit",
-      "ruleId": advice.id,
-      "severity": severities[advice.severity],
-      "type": "VULNERABILITY",
-      "efforMinutes": 0,
-      "primaryLocation": {
-        "message": `${advice.module_name} ${advice.vulnerable_versions}
-${advice.title || ''}
+    rules.push({
+      id: `${advice.id}`,
+      name: advice.github_advisory_id || advice.npm_advisory_id || `rule_${advice.id}`,
+      description: `<h1>${advice.module_name} ${advice.vulnerable_versions}</h1>
+<h2>${advice.title || ''}</h2>
 
 Overview:
+<pre>
 ${advice.overview || ''}
+</pre>
 
 References:
+<pre>
 ${advice.references || ''}
+</pre>
 `,
-        "filePath": "pnpm-lock.yaml",
+      cleanCodeAttribute: "TRUSTWORTHY",
+      engineId: "pnpm-audit",
+      impacts: [{
+        softwareQuality: "SECURITY",
+        severity: severities[advice.severity],
+      }]
+    })
+    issues.push({
+      ruleId: `${advice.id}`,
+      efforMinutes: 0,
+      primaryLocation: {
+        message: advice.title,
+        filePath: "pnpm-lock.yaml",
       },
-      "secondaryLocations": []
+      secondaryLocations: []
     })
   }
-  console.log(JSON.stringify({ issues }, null, 2))
+  console.log(JSON.stringify({ rules, issues }, null, 2))
 }
 
 main()
